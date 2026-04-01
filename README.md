@@ -8,3 +8,4 @@ How to use:
 
 Testing:;
 just run php artisan test 
+
