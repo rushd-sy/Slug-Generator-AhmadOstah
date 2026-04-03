@@ -13,7 +13,7 @@ class GenerateSlug extends Command
     public function handle()
     {
         $title = $this->ask('Please enter the title');
-        $slug = Str::slug($title); 
+        $slug = Str::slugify($title); 
         $this->line("The slug for \"{$title}\" is <info>{$slug}</info>");
     }
 }
