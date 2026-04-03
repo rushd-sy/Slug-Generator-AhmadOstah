@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Str::macro('slugify', function ($title) {
+            return Str::of($title)
+                ->lower()
+                ->replace(' ', '-')
+                ->replaceMatches('/[^a-z0-9\-]/', '')
+                ->replaceMatches('/-+/', '-')
+                ->trim('-');
+    });
     }
 }
