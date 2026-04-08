@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
+// use Illuminate\Support\Str;
+
+use Illuminate\Support\Stringable;
+use Mockery\MockInterface;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,8 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Str::macro('slugify', function ($title) {
-            return Str::of($title)
+     Stringable::macro('slugify', function ($title) {
+            return Stringable::of($title)
                 ->lower()
                 ->replace(' ', '-')
                 ->replaceMatches('/[^a-z0-9\-]/', '')
