@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
      Stringable::macro('slugify', function ($title) {
-            return Stringable::of($title)
+            return str($title)
                 ->lower()
                 ->replace(' ', '-')
                 ->replaceMatches('/[^a-z0-9\-]/', '')
