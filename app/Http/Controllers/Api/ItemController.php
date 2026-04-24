@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Item;
+use App\Actions\ItemAction\CreateItemAction;
+use App\Http\Requests\ItemRequest;
+use App\Actions\ItemAction\UpdateItemAction;
 
 class ItemController extends Controller
 {
@@ -13,33 +16,33 @@ class ItemController extends Controller
      */
     public function index(Item $item)
     {
-        return response()->json(Item::all());
+        $itemes=Item::paginate(10);
+        return response()->json($itemes);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ItemRequest $request)
     {
-        $item = Item::create($request->all());
+        $item=app(CreateItemAction::class)->handle($request->validated());
         return response()->json($item, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Item $item)
     {
-        $item = Item::find($id);
         return response()->json($item);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Item $item)
+    public function update(ItemRequest $request, Item $item)
     {
-        $item->update($request->all());
+        $item = app(UpdateItemAction::class)->handle($request->validated(), $item);
         return response()->json($item);
     }
 
