@@ -17,7 +17,7 @@ class GenerateSlug extends Command
     {
         $number = $this->inputNumber();
         $freq = [];
-        $storeInput = [];
+        $slugStoringArray = [];
         
         for ($i = 1; $i <= $number; $i++)
         {
@@ -27,27 +27,26 @@ class GenerateSlug extends Command
 
             $slugString = (string) $slug;
 
-            $this->checkFrequency($slugString, $freq);
-            if ($freq[$slugString] == 1) 
+            if ($this->checkFrequency($slugString, $freq)) 
             {
-                $this->storeInputs($title, $slugString, $storeInput);
+                $this->storeInArray($title, $slugString, $slugStoringArray);
             }
         }
-        $existedSlug = $this->existedSluges($storeInput);
-        $finalInputp = [];
+        $existedSlug = $this->existedSluges($slugStoringArray);
+        $finalStoringArray = [];
 
-        foreach($storeInput as $input)
+        foreach($slugStoringArray as $input)
         {
             $this->inputs($slug, $title, $input);
 
             if(!in_array($slug, $existedSlug))
             {
-                $this->finalInputs($finalInputp, $title, $slug);    
+                $this->finalStoreInArray($finalStoringArray, $title, $slug);    
             }
         }
-        if(!empty($finalInputp))
+        if(!empty($finalStoringArray))
         {
-            $this->storeInDB($finalInputp);   
+            $this->storeInDB($finalStoringArray);   
         }
         $this->slugHistory();
     }
@@ -80,21 +79,23 @@ class GenerateSlug extends Command
         $this->line("The slug for \"{$title}\" is <info>{$slug}</info>");
         $this->newline();
     }
-    public function checkFrequency($slugString, &$freq)//good
+    public function checkFrequency($slugString, &$freq):bool//good
     {
         $freq[$slugString] = ($freq[$slugString] ?? 0) + 1;
+
+        return $freq[$slugString] ==1?true:false;   
     }
-    public function storeInputs($title, $slugString, &$storeInput)//good
+    public function storeInArray($title, $slugString, &$slugStoringArray)//good
     {
-         $storeInput[] = [
+         $slugStoringArray[] = [
                     'title' => $title,
                     
                     'slug' => $slugString,
                 ];
     }
-    public function existedSluges($storeInput)//good
+    public function existedSluges($slugStoringArray)//good
     {
-        $existedSluge=Sluged::whereIn('slug', array_column($storeInput, 'slug'))->pluck('slug')->toArray();
+        $existedSluge=Sluged::whereIn('slug', array_column($slugStoringArray, 'slug'))->pluck('slug')->toArray();
         return $existedSluge;
     }
     public function inputs(&$slug,&$title,&$input)//good
@@ -102,17 +103,17 @@ class GenerateSlug extends Command
         $title = $input['title'];
         $slug = $input['slug'];
     }
-    public function finalInputs(&$finalInputp,$title, $slug)//good
+    public function finalStoreInArray(&$finalStoringArray,$title, $slug)//good
     {
-        $finalInputp[] = [
+        $finalStoringArray[] = [
                     'string' => $title,
                     'slug' => $slug,
                 ];
     }
-    public function storeInDB($finalInputp)//good
+    public function storeInDB($finalStoringArray)//good
     {
         try {
-            Sluged::insert($finalInputp);
+            Sluged::insert($finalStoringArray);
         } catch (\Exception $e) {
             $this->error('Failed to save slugs: ' . $e->getMessage());
         }
